@@ -55,6 +55,7 @@ void update_values(int sum, int max, int maxi, int maxj, int min, int mini, int 
 
   pthread_mutex_unlock(&updatelock);
 }
+
 void set_values(int max, int maxi, int maxj, int min, int mini, int minj) {
   if (max > final_max)
     set_max(max, maxi, maxj);
