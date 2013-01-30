@@ -89,6 +89,14 @@ double read_timer() {
     return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
 
+void print_result() {
+  printf("The total is %d\n", final_sum);
+  printf("The max is %d at %d,%d\n", final_max, final_maxi, final_maxj);
+  printf("The min is %d at %d,%d\n", final_min, final_mini, final_minj);
+  printf("The execution time is %g sec\n", end_time - start_time);
+}
+
+
 /* read command line, initialize, and create threads */
 int main(int argc, char *argv[]) {
   int i, j;
@@ -141,12 +149,10 @@ int main(int argc, char *argv[]) {
     pthread_create(&workerid[l], &attr, Worker, (void *) l);
 
   pthread_cond_wait(&finished, &updatelock);
-
+  
   end_time = read_timer();
-  printf("The total is %d\n", final_sum);
-  printf("The max is %d at %d,%d\n", final_max, final_maxi, final_maxj);
-  printf("The min is %d at %d,%d\n", final_min, final_mini, final_minj);
-  printf("The execution time is %g sec\n", end_time - start_time);
+  
+  print_result();
 
   pthread_exit(NULL);
 }
