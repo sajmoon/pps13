@@ -18,8 +18,9 @@
 #include <stdbool.h>
 #include <time.h>
 #include <sys/time.h>
-#define MAXSIZE 10000  /* maximum matrix size */
-#define MAXWORKERS 10   /* maximum number of workers */
+#define MAXSIZE 10000     /* maximum matrix size */
+#define MAXWORKERS 10     /* maximum number of workers */
+#define DEBUG
 
 pthread_mutex_t barrier;  /* mutex lock for the barrier */
 pthread_cond_t go;        /* condition variable for leaving */
@@ -52,9 +53,17 @@ double read_timer() {
     return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
 
-double start_time, end_time; /* start and end times */
-int size, stripSize;  /* assume size is multiple of numWorkers */
-int sums[MAXWORKERS]; /* partial sums */
+double start_time, end_time;  /* start and end times */
+int size, stripSize;          /* assume size is multiple of numWorkers */
+int sums[MAXWORKERS];         /* partial sums */
+int maxs[MAXWORKERS];         /* maxs values */
+int maxis[MAXWORKERS];        /* max:i's */
+int maxjs[MAXWORKERS];        /* max:j's */
+
+int mins[MAXWORKERS];         /* mins values */
+int minis[MAXWORKERS];        /* min:i's */
+int minjs[MAXWORKERS];        /* min:j's */
+
 int matrix[MAXSIZE][MAXSIZE]; /* matrix */
 
 void *Worker(void *);
@@ -80,11 +89,14 @@ int main(int argc, char *argv[]) {
   if (size > MAXSIZE) size = MAXSIZE;
   if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
   stripSize = size/numWorkers;
+  
+  /* initialize random seed */
+  srand ( time(NULL) );
 
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
 	  for (j = 0; j < size; j++) {
-          matrix[i][j] = 1;//rand()%99;
+          matrix[i][j] = rand()%99;
 	  }
   }
 
@@ -110,7 +122,7 @@ int main(int argc, char *argv[]) {
    After a barrier, worker(0) computes and prints the total */
 void *Worker(void *arg) {
   long myid = (long) arg;
-  int total, i, j, first, last;
+  int total, i, j, first, last, max, maxi, maxj, min, mini, minj;
 
 #ifdef DEBUG
   printf("worker %d (pthread id %d) has started\n", myid, pthread_self());
@@ -118,23 +130,68 @@ void *Worker(void *arg) {
 
   /* determine first and last rows of my strip */
   first = myid*stripSize;
-  last = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
+  last  = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
 
   /* sum values in my strip */
   total = 0;
-  for (i = first; i <= last; i++)
-    for (j = 0; j < size; j++)
+  max   = -100;
+  maxi  = 0;
+  maxj  = 0;
+  min   = 100;
+  mini  = 0;
+  minj  = 0;
+
+  for (i = first; i <= last; i++) {
+    for (j = 0; j < size; j++) {
+      if (matrix[i][j] > max) { 
+        max  = matrix[i][j];
+        maxi = i;
+        maxj = j;
+      }
+      if (matrix[i][j] < min) {
+        min  = matrix[i][j];
+        mini = i;
+        minj = j;
+      }
       total += matrix[i][j];
-  sums[myid] = total;
+    }
+  }
+  sums[myid]  = total;
+  maxs[myid]  = max;
+  maxis[myid] = maxi;
+  maxjs[myid] = maxj;
+  mins[myid]  = min;
+  minis[myid] = mini;
+  minjs[myid] = minj;
+  
   Barrier();
   if (myid == 0) {
     total = 0;
-    for (i = 0; i < numWorkers; i++)
+    max   = -100;
+    maxi  = 0;
+    maxj  = 0;
+    min   = 100;
+    mini  = 0;
+    minj  = 0;
+    for (i = 0; i < numWorkers; i++) {
+      if (maxs[i] > max ) {
+        max  = maxs[i];
+        maxi = maxis[i];
+        maxj = maxjs[i];
+      }
+      if (mins[i] < min) {
+        min  = mins[i];
+        mini = minis[i];
+        minj = minjs[i];
+      }
       total += sums[i];
+    }
     /* get end time */
     end_time = read_timer();
     /* print results */
     printf("The total is %d\n", total);
+    printf("The max is %d at %d,%d\n", max, maxi, maxj);
+    printf("The min is %d at %d,%d\n", min, mini, minj);
     printf("The execution time is %g sec\n", end_time - start_time);
   }
 }
