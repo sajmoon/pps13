@@ -20,10 +20,8 @@
 #include <sys/time.h>
 #define MAXSIZE 10000       /* maximum matrix size */
 #define MAXWORKERS 10       /* maximum number of workers */
-#define DEBUG
 
-pthread_mutex_t updatelock; 
-pthread_mutex_t baglock; 
+pthread_mutex_t updatelock; /* mutex lock for the barrier */
 pthread_cond_t finished;    /* condition variable for leaving */
 
 int numWorkers;             /* number of workers */ 
@@ -33,9 +31,9 @@ int final_sum;
 int final_max, final_maxi, final_maxj;
 int final_min, final_mini, final_minj;
 int final_num_workers;
-int current_row;
+
 double start_time, end_time;  /* start and end times */
-int size;                     /* assume size is multiple of numWorkers */
+int size, stripSize;          /* assume size is multiple of numWorkers */
 
 int matrix[MAXSIZE][MAXSIZE]; /* matrix */
 
@@ -52,7 +50,7 @@ void update_values(int sum, int max, int maxi, int maxj, int min, int mini, int 
   
   set_values(max, maxi, maxj, min, mini, minj);
 
-  if (final_num_workers == size)
+  if (final_num_workers == numWorkers)
     pthread_cond_broadcast(&finished);
 
   pthread_mutex_unlock(&updatelock);
@@ -79,16 +77,16 @@ void set_min(int min, int mini, int minj) {
 
 /* timer */
 double read_timer() {
-  static bool initialized = false;
-  static struct timeval start;
-  struct timeval end;
-  if( !initialized )
-  {
-    gettimeofday( &start, NULL );
-    initialized = true;
-  }
-  gettimeofday( &end, NULL );
-  return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
+    static bool initialized = false;
+    static struct timeval start;
+    struct timeval end;
+    if( !initialized )
+    {
+        gettimeofday( &start, NULL );
+        initialized = true;
+    }
+    gettimeofday( &end, NULL );
+    return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
 
 void print_result() {
@@ -112,19 +110,17 @@ int main(int argc, char *argv[]) {
 
   /* initialize mutex and condition variable */
   pthread_mutex_init(&updatelock, NULL);
-  pthread_mutex_init(&baglock, NULL);
   pthread_cond_init(&finished, NULL);
 
   final_num_workers = 0;
   final_min = 1000;
-
-  current_row = 0;
 
   /* read command line args if any */
   size = (argc > 1)? atoi(argv[1]) : MAXSIZE;
   numWorkers = (argc > 2)? atoi(argv[2]) : MAXWORKERS;
   if (size > MAXSIZE) size = MAXSIZE;
   if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
+  stripSize = size/numWorkers;
   
   /* initialize random seed */
   srand ( time(NULL) );
@@ -161,42 +157,28 @@ int main(int argc, char *argv[]) {
   pthread_exit(NULL);
 }
 
-int get_new_row() {
-  pthread_mutex_lock(&baglock);
-  
-  int c = current_row;
-  current_row++;
-  
-  pthread_mutex_unlock(&baglock);
-  return c;
-}
-
 void *Worker(void *arg) {
-  int row = 0;
-  while (row < size) {
-    
-    row = get_new_row();
-  
-    if (row >= size)
-      break;
-    int total, i, j, first, last, max, maxi, maxj, min, mini, minj;
+  long myid = (long) arg;
+  int total, i, j, first, last, max, maxi, maxj, min, mini, minj;
 
-  #ifdef DEBUG
-    printf("worker %d (pthread id %d) calcultaion row %d of size: %d\n", pthread_self(), pthread_self(), row, size);
-  #endif
+#ifdef DEBUG
+  printf("worker %d (pthread id %d) has started\n", myid, pthread_self());
+#endif
 
-    /* determine first and last rows of my strip */
-    i = row;
+  /* determine first and last rows of my strip */
+  first = myid*stripSize;
+  last  = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
 
-    /* sum values in my strip */
-    total = 0;
-    max   = -1000;
-    maxi  = 0;
-    maxj  = 0;
-    min   = 1000;
-    mini  = 0;
-    minj  = 0;
+  /* sum values in my strip */
+  total = 0;
+  max   = -1000;
+  maxi  = 0;
+  maxj  = 0;
+  min   = 1000;
+  mini  = 0;
+  minj  = 0;
 
+  for (i = first; i <= last; i++) {
     for (j = 0; j < size; j++) {
       if (matrix[i][j] > max) { 
         max  = matrix[i][j];
@@ -210,6 +192,7 @@ void *Worker(void *arg) {
       }
       total += matrix[i][j];
     }
-    update_values(total, max, maxi, maxj, min, mini, minj);
-  } 
+  }
+
+  update_values(total, max, maxi, maxj, min, mini, minj);
 } 
