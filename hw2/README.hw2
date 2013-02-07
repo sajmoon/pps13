@@ -1,0 +1,36 @@
+
+HW2.
+
+
+Assignment 1:
+a)
+Starrt with:
+
+make clean && make && ./matrixSum-openmp.o size workers
+
+size is the matrix size.
+workers = Number of parallell exections.
+
+Resultat:
+
+The assignment was for the sequential solution to take 1-2 seconds, but i never reach that amout of time.
+
+
+Matrix Size:      10          1000        10000
+Workers   
+1 				1.4*E^-5  		0.002 		0.191485
+2 				1.3*E^-5 		0.0013 		0.15032
+3 				1.7*E^-5  		0.0013 		0.121889
+4				1.5*E^-5 		0.007 		0.1054
+
+Some sample results:
+make clean && make && ./matrixSum-openmp.o 10000 4
+it took 0.102081 seconds
+
+make clean && make && ./matrixSum-openmp.o 10000 1
+it took 0.186508 seconds
+
+Discussion:
+Dealing with small numbers we do not get a decrease in executiontime due to the fact that they have an inherit cost to start. 
+
+Experiments on bigger matrices show a decrease in time!
