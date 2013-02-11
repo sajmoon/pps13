@@ -39,6 +39,10 @@ Assignment 3:
 PalindromicWords.
 =================
 
+How to run it:
+make clean && make all && cat words | ./palindromic.o 4 10000
+
+Results:
 For 3 runs for each settings, these are the average score. 
 These tests was performed on my laptop, with the spec seen below:
 
@@ -49,6 +53,17 @@ cpu family	: 6
 model		: 58
 model name	: Intel(R) Core(TM) i5-3317U CPU @ 1.70GHz
 
+Getting all palendromic words, inc draw and ward:
+
+DictSize:   1k  		10k 		All(ca 25k)
+Workers:
+1 			0.03877 	3.36065  	21.4624
+2 			0.02528 	1.73229 	10.7681
+4  			0.03035		1.32983		8.16470
+8 			0.05549 	2.30911		11.929733
+
+
+Getting only one of draw and ward.
 DictSize: 1000 			10.000			MAX(ca 25000)
 Workers:
 1 			0.0167 		1.10948  		7.08557
@@ -56,3 +71,11 @@ Workers:
 3 			0.0054		0.54587 		3.44525
 4 			0.0045 		0.48727 		3.19977
 16 			0.0823 		1.30995 		5.93965
+
+
+Conclusions:
+
+We can be pretty sure that our threads work, we can see an improvement. 
+We also see that when we exceed the amount of cores out processor has we do not 
+get any further improvement. This is due to the overhead of creating,
+and organizing new threads/processes.

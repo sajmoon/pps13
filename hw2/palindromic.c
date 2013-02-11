@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <omp.h>
 
+/* Defines max workers and ma dictionary size */
 #define WORDSIZE 27000
 #define MAXWORKERS 10 
 
 int numWorkers, size;
 double start_time, end_time;
 
+/* reverses a string and overwrites it with the new value. */
 char* rev(char* str)
 {
   int end= strlen(str)-1;
@@ -26,18 +28,20 @@ char* rev(char* str)
   return str;
 }
 
-
+/* Main method */
 int main(int argc, char *argv[]) {
   	int totalWordCount = 1;
   	
 	printf("\n\nFind palindromc words\n");
-	
+	totalWordCount = 0;
 
+	//sets workers and dictionary list according to input parameters
 	numWorkers = (argc > 1)? atoi(argv[1]) : MAXWORKERS;
 	totalWordCount = (argc > 2)? atoi(argv[2]) : WORDSIZE;
 
 	printf("Using %i processors\n", numWorkers);
 	char * words[WORDSIZE] = {0};
+	int  palindromicWords[WORDSIZE] = {0};
 	
 	int wordCount = 1;
 	for (wordCount = 0; wordCount < totalWordCount; wordCount++) {
@@ -48,49 +52,43 @@ int main(int argc, char *argv[]) {
 
 		if (strcmp(pStr, "") == 0 ) {
 			// if end of file
+			// We have no more workds to play with.
 			
 			break;
 		}
 		
+		// Keeps track of how manywords we have. 
 		words[wordCount] = pStr;
 		
 	}
 
+	// set number of threads/workers
 	omp_set_num_threads(numWorkers);
 
  	start_time = omp_get_wtime();
 	int i = 0;
-	//for (i = 0; i < wordCount; i++) {
-	//	printf("words in list: %s\n", words[i]);
-	//
 	int j = 0;
 	int palindromCount = 0;
 
 	for (j = 0; j < wordCount; j++) {
+		// Check all words once.
 		char str[50];
 
 		strcpy( str, words[j] );
 		rev(str);
-		// printf("words %s %s\n", str, words[j]);
-
-		// printf("str: %s\n", str);
 		
-		// printf("revstr: %s\n", str);
-		
-		// printf("revstr: %i %s -> %s (%i)\n", j, str, words[j], strcmp(str, words[j]));
-
-		// printf("rev(str) %s\n", rev(str));
-		// printf("str: %s\n", str);
 		int a;
-#pragma omp parallel for reduction (+:palindromCount) private(i)
-		for (i = j; i < wordCount; i++) {
+		#pragma omp parallel for reduction (+:palindromCount) private(i)
+		for (i = 0; i < wordCount; i++) {
+			// and for that word(i) check agains all other words
+			// if we only want one of the terms on the list, 
+			// like draw / ward we could set this to i = j;
 			char str2[50];
 			strcpy(str2, words[i]);
-			// printf("%s %s %i\n", str, str2, strcmp(str, str2));
-			// printf("evstr: %s -> %s (%i)\n", str, str2, strcmp(str, str2));
-
+		
 			if ( strcmp(str, str2) == 0 ) {
-				//printf("found palidrom %s -> %s\n", words[i], words[j]);
+				// found a palindromic word
+				palindromicWords[i] = 1;
 				palindromCount++;
 			}
 		}
@@ -98,6 +96,16 @@ int main(int argc, char *argv[]) {
 
 
   	end_time = omp_get_wtime();
+
+  	FILE *fp;
+	fp=fopen("result", "w");
+	
+
+  	for (i = 0; i < wordCount; i++) {
+  		if (palindromicWords[i] == 1) {
+  			fprintf(fp, "%s\n", words[i]);
+  		}
+  	}
 
   	printf("\nResult:\n");
 	printf("Found %i palindroms, ", palindromCount);
