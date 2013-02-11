@@ -34,3 +34,25 @@ Discussion:
 Dealing with small numbers we do not get a decrease in executiontime due to the fact that they have an inherit cost to start. 
 
 Experiments on bigger matrices show a decrease in time!
+
+Assignment 3:
+PalindromicWords.
+=================
+
+For 3 runs for each settings, these are the average score. 
+These tests was performed on my laptop, with the spec seen below:
+
+cat /proc/cupinfo
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 58
+model name	: Intel(R) Core(TM) i5-3317U CPU @ 1.70GHz
+
+DictSize: 1000 			10.000			MAX(ca 25000)
+Workers:
+1 			0.0167 		1.10948  		7.08557
+2 			0.0056 		0.60905		 	3.87641
+3 			0.0054		0.54587 		3.44525
+4 			0.0045 		0.48727 		3.19977
+16 			0.0823 		1.30995 		5.93965
