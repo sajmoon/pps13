@@ -41,6 +41,10 @@ PalindromicWords.
 
 How to run it:
 make clean && make all && cat words | ./palindromic.o 4 10000
+first parameter (4) is number of threads to use.
+The second parameter (10000) is the size of the words list to use. If this is set below 
+lower then the total amount of rows in the file words, we stop parsing after this 
+amount of words.
 
 Results:
 For 3 runs for each settings, these are the average score. 
@@ -64,7 +68,7 @@ Workers:
 
 
 Getting only one of draw and ward.
-DictSize: 1000 			10.000			MAX(ca 25000)
+DictSize:   1000 		10.000			MAX(ca 25000)
 Workers:
 1 			0.0167 		1.10948  		7.08557
 2 			0.0056 		0.60905		 	3.87641
