@@ -1,0 +1,18 @@
+README for hw3
+
+
+Assignemtn 1:
+=============
+
+make clean && make ass1 && ./ass1.o 100
+
+Where the parameter is the number of baby birds to spawn.
+
+
+Assignment 2:
+==============
+
+make clean && make ass2 && ./ass2.o 10 25
+
+The first parameter is number of bees collectiong honey
+the second parameter is the maximum size of the pot to fill before waking the bear.

@@ -13,7 +13,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #define SHARED 0
-#define MAXBABIES 10
+#define MAXBABIES 100
 
 void *Producer(void *);  /* the two threads */
 void *Consumer(void *);
@@ -28,7 +28,7 @@ int numBabies;
 
 int main(int argc, char *argv[]) {
 	/* thread ids and attributes */
-	numBabies = (argc > 2)? atoi(argv[2]) : MAXBABIES;
+	numBabies = (argc > 1)? atoi(argv[1]) : MAXBABIES;
 	pthread_t pid; 
 	pthread_t workerid[MAXBABIES]; 
 
