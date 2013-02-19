@@ -1,0 +1,15 @@
+
+to start matrix sum:
+
+make clean && make && ./matrixSum.o 
+
+or with parameters
+
+make clean && make && ./matrixSum.0 2000 10
+
+first parameter is size of the matrix. it will generate a 2000x2000 matrix populated with random rumbers between 0 - 98
+the second parameter is numbers of threads.
+
+It will output the sum of the matrix. Min and max value, and the respiective location as x,y coordiantes.
+
+it will also output the time it took to complete.
