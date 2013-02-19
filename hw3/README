@@ -16,3 +16,5 @@ make clean && make ass2 && ./ass2.o 10 25
 
 The first parameter is number of bees collectiong honey
 the second parameter is the maximum size of the pot to fill before waking the bear.
+
+This is pretty unfair. The bees collect but dont get to eat!! Damn it. But seriousliy, i think all the threads get an even amount of time over time. The same with assignment 1.
