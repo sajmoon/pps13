@@ -20,11 +20,10 @@
 #include <sys/time.h>
 #define MAXSIZE 10000       /* maximum matrix size */
 #define MAXWORKERS 10       /* maximum number of workers */
-#define DEBUG
 
-pthread_mutex_t updatelock; 
-pthread_mutex_t baglock; 
-pthread_cond_t finished;    /* condition variable for leaving */
+pthread_mutex_t updatelock; /* lock for updating variables */
+pthread_mutex_t baglock;    /* changed from the barrier to a bag of tasks */
+pthread_cond_t  finished;   /* condition variable for leaving */
 
 int numWorkers;             /* number of workers */ 
 int numArrived = 0;         /* number who have arrived */
@@ -44,9 +43,10 @@ void set_values(int, int, int, int, int, int);
 void set_max(int, int, int);
 void set_min(int, int, int);
 
+// Used to sum up partial results. 
 void update_values(int sum, int max, int maxi, int maxj, int min, int mini, int minj) {
   pthread_mutex_lock(&updatelock);
-  int id = rand()%1000;
+  int id = rand()%99;
   final_sum  += sum;
   final_num_workers++;
   
