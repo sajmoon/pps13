@@ -62,7 +62,7 @@ public class Main {
 					System.out.println(r1.toString());
 					System.out.println(r2.toString());
 					System.out.println(r3.toString());
-					System.out.println(r3.toString());
+					System.out.println(r4.toString());
 					for (int i = 0; i < maxV; i++) {
 						System.out.println(vehicles[i].toString());
 					}
@@ -91,7 +91,7 @@ public class Main {
 		System.out.println("----------------------");
 		System.out.println("How to use");
 		System.out.println("Parameters:");
-		System.out.println("1. Number of vehicles");
+		System.out.println("1. Number of slots in the station");
 		System.out.println("2. Max liters of nitrogen in the spacestation");
 		System.out.println("3. Max liters of quantum fluids in spacestation");
 		System.out.println("3. number of vehicles in the universe");
