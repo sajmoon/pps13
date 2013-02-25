@@ -1,0 +1,89 @@
+pps13 HW4
+
+Assignment 1.
+
+Space Fueling Station
+=====================
+
+Spacecrafts can be of 3 different kinds.
+Stelth: consume quantum fluids.
+Fast:   consume quantum and nitrofuel
+Small:  consume nitrofuel only
+
+
+Ships have different actions:
+Flying (consumes fuel)
+queing (waitng for a spot at the station, dont cnsume fuel)
+docked (is beeing served by the station. This takes some time.)
+
+Refuelingships go between earth and the station.
+They also queue for a spot at the station. They can only empty
+the cargo if the station has room for it otherwise they wait.
+
+earth is located 70 distance units away. Fuelingships travell 1 unit per "tick", 200ms.
+To start the application use:
+
+make all && java pps/Main 5 10000 5000 25
+
+it takes 4 parameters:
+----------------------
+Help for Fuling Spacestation Simulator
+Homework 4 in PPS13, KTH
+----------------------
+How to use
+Parameters:
+1. Number of slots in the station
+2. Max liters of nitrogen in the spacestation
+3. Max liters of quantum fluids in spacestation
+3. number of vehicles in the universe
+
+The above example of paramters works pretty well.
+
+The application also starts 4 refueling ships. 
+These carry 5000nitro, or 2000 quantum or 1000nitro + 1000 quantum.
+
+So if you have less then 1000 of any of the fuels in the station your gonna have a bad time.
+
+Ships consume one unit per "tick" which is set to 200ms, if they are flying. If they are queing the do not consume any amount at all.
+
+The output from the program:
+
+[Station] 6318/10000 3923/5000 slots: 0/6
+[Refuel-1] Queued 50/100(5000 + 0)
+[Refuel-2] on way to station 45/100(0 + 1000)
+[Refuel-3] on way from station 83/100(0 + 0)
+[Refuel-4] on way from station 72/100(0 + 0)
+[ 0 Stealt   q] Flying  100/100 & 040/100
+[ 1 Fast   f+q] Flying  092/100 & 092/100
+[ 2 Small  f  ] Flying  092/100 & 100/100
+[ 3 Stealt   q] Flying  100/100 & 040/100
+[ 4 Small  f  ] Flying  092/100 & 100/100
+[ 5 Stealt   q] Flying  100/100 & 046/100
+[ 6 Fast   f+q] Flying  093/100 & 093/100
+[ 7 Stealt   q] Flying  100/100 & 040/100
+[ 8 Small  f  ] Flying  092/100 & 100/100
+[ 9 Stealt   q] Flying  100/100 & 040/100
+[10 Fast   f+q] Docked  009/100 & 009/100
+[11 Fast   f+q] Flying  092/100 & 092/100
+[12 Small  f  ] Docked  009/100 & 100/100
+[13 Stealt   q] Flying  100/100 & 040/100
+[14 Fast   f+q] Docked  009/100 & 009/100
+[15 Fast   f+q] Docked  009/100 & 009/100
+[16 Fast   f+q] Flying  010/100 & 010/100
+[17 Stealt   q] Flying  100/100 & 050/100
+[18 Fast   f+q] Docked  009/100 & 009/100
+[19 Stealt   q] Flying  100/100 & 050/100
+[20 Small  f  ] Docked  009/100 & 100/100
+[21 Small  f  ] Flying  010/100 & 100/100
+[22 Stealt   q] Flying  100/100 & 050/100
+[23 Stealt   q] Flying  100/100 & 050/100
+[24 Small  f  ] Flying  010/100 & 100/100
+[25 Small  f  ] Flying  020/100 & 100/100
+[26 Fast   f+q] Flying  020/100 & 020/100
+[27 Fast   f+q] Flying  010/100 & 010/100
+[28 Small  f  ] Flying  010/100 & 100/100
+[29 Small  f  ] Flying  010/100 & 100/100
+
+
+In this you can clearly see what the ships are doing, what type they are and what that type consumes.
+Stelas for example consumes quantum fluid as indicated by the q.
